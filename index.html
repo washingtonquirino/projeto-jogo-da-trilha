@@ -129,6 +129,37 @@ body * {
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
+    .painel {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .box {
+      background: #ffffff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    /* ===== CRONÔMETRO ===== */
+    #tempo {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    /* ===== DADOS ===== */
+    .resultado-dado {
+      font-size: 28px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+
     button {
         position: relative;
         background-color: #0766ff;
@@ -186,6 +217,34 @@ body * {
 
 <div class="tabuleiro" id="tabuleiro"></div>
 
+<!-- ===== PAINEL ===== -->
+<div class="painel">
+
+  <!-- CRONÔMETRO -->
+  <div class="box">
+    <div id="tempo">00:00</div>
+    <button onclick="iniciarCronometro()">Iniciar</button>
+    <button onclick="pausarCronometro()">Pausar</button>
+    <button onclick="zerarCronometro()">Zerar</button>
+  </div>
+
+  <!-- DADO 6 FACES -->
+  <div class="box">
+    <div><strong>Dado (6 faces)</strong></div>
+    <button onclick="rolarDado(6)">Rolar</button>
+    <div id="dado6" class="resultado-dado">–</div>
+  </div>
+
+  <!-- DADO 8 FACES -->
+  <div class="box">
+    <div><strong>Dado (8 faces)</strong></div>
+    <button onclick="rolarDado(8)">Rolar</button>
+    <div id="dado8" class="resultado-dado">–</div>
+  </div>
+
+</div>
+
+
 <div class="instrucoes">
   <h3>Regras</h3>
   <ul>
@@ -197,7 +256,49 @@ body * {
   </ul>
 </div>
 
+
+
 <script>
+
+  /* ===== CRONÔMETRO ===== */
+let segundos = 0;
+let intervalo = null;
+
+function atualizarTempo() {
+  const min = String(Math.floor(segundos / 60)).padStart(2,'0');
+  const sec = String(segundos % 60).padStart(2,'0');
+  document.getElementById('tempo').textContent = `${min}:${sec}`;
+}
+
+function iniciarCronometro() {
+  if (!intervalo) {
+    intervalo = setInterval(() => {
+      segundos++;
+      atualizarTempo();
+    }, 1000);
+  }
+}
+
+function pausarCronometro() {
+  clearInterval(intervalo);
+  intervalo = null;
+}
+
+function zerarCronometro() {
+  pausarCronometro();
+  segundos = 0;
+  atualizarTempo();
+}
+
+/* ===== DADOS ===== */
+function rolarDado(lados) {
+  const resultado = Math.floor(Math.random() * lados) + 1;
+  if (lados === 6) document.getElementById('dado6').textContent = resultado;
+  if (lados === 8) document.getElementById('dado8').textContent = resultado;
+}
+
+
+
   const tabuleiro = document.getElementById('tabuleiro');
 
   const casas = [
@@ -207,6 +308,7 @@ body * {
     '45','46 (JOGUE O DADO E TIRE UM NUMERO ÍMPAR) CASO CONTRÁRIO VOLTE DUAS CASAS','47','48','49','50','51 AVNCE 2 CASAS','52','53','54','55','56','STOP','58','59','60','61 VOLTE PARA A CASA 46',
     '62','63','64','65','66','STOP ','68','69','70','71','72','73','CHEGADA'
   ];
+  
 
   // Criar casas do tabuleiro
   casas.forEach((texto, index) => {
